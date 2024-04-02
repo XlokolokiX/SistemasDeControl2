@@ -37,12 +37,12 @@ xop = [0 0]';
 %Simulación mediante Euler
 tF = 2e-3;                               %Tiempo final de la simulación
 N = floor(tF/tR)                         %Número de puntos a simular
-t = 0:tR:N*tR;                           %Vector tiempo
+t = 0 : tR : N*tR;                       %Vector tiempo
 u = Ei*square(2*pi/2e-3*(t));            %Señal Cuadrada con período 2mS
 
 for i=1: N
     xp = A*(x-xop) + B*u(i);
-    x = x + xp*tR;
+    x = x + xp*tR; %euler
     aux = C*x;
     Y(i+1) = aux(1);
     I(i+1) = x(2);
