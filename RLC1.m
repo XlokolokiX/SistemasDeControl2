@@ -4,7 +4,6 @@ clear all; clc; close all;
 R = 47; L = 1e-6; C=100e-9; %Valores asignados Para el RLC
 Ei = 12;                    %Tensión de entrada
 
-
 A = [0 1/C ; -1/L -R/L]     %Matriz de Estados
 B = [0 1/L]'                %Matriz de entrada a Estado
 C1 = [0 R]                  %Matriz de estado a Salida (VR)

@@ -101,14 +101,14 @@ G_I = tf(k_I*[T3_I 1],conv([T1_I 1],[T2_I 1]))
 [Iobt, tobt] = lsim(G_I, Va(1:1500), t(1:1500));
 
 figure(3)
-subplot(4,1,1)
-plot(tobt,Wm(1:1500));
-title('Velocidad Angular Excel'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);
-subplot(4,1,2)
+subplot(2,1,1)
+plot(tobt,Wm(1:1500),tobt,I(1:1500));
+title('Velocidad Angular Excel'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);legend('Obtenida','Excel')
+subplot(2,1,2)
 plot(tobt,Wobt);
-title('Velocidad Angular Obtenida'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);
+title('Velocidad Angular Obtenida'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);legend('Obtenida','Excel')
 subplot(4,1,3)
-plot(tobt,I(1:1500));
+plot();
 title('Corriente Excel'); xlabel('Tiempo [s]'); ylabel('[I]');
 subplot(4,1,4)
 plot(tobt,Iobt);
@@ -118,13 +118,7 @@ title('Corriente Obtenida'); xlabel('Tiempo [s]'); ylabel('[I]');
 ki = (G_W.num{1}(3))
 J = G_I.num{1}(2)
 B = G_I.num{1}(3)
-L = G_I.den{1}(1)*ki*km/J
+L = G_I.den{1}(1)/J
 R = (G_I.den{1}(2)-L*B)/J
-
-km = ki
-
-
-
+km = (1-R*B)/ki
 %--------------------------------------------------------------------------
-
-

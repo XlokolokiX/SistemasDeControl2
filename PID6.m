@@ -11,7 +11,7 @@
 clc; clear all; close all;
 
 %PARÁMETROS DEL MOTOR------------------------------------------------------
-Laa = 4.99e-4; J = 4.1302e-6; Ra = 19.9758; Bm = 7.4654e-16; Ki = 16.5207; Km = 0.0605;     
+Laa = 7.0274e-4; J = 2.0628e-9; Ra = 19.9758; Bm = 7.4654e-16; Ki = 0.01162; Km = 0.0605;     
 Ei = 12;                                                                   
 %--------------------------------------------------------------------------
 %MODELADO EN ESP. ESTADO---------------------------------------------------
@@ -29,7 +29,7 @@ G1 = tf(num1, den1)
 %RESPUESTAS DEL SISTEMA----------------------------------------------------
 poles = pole(G);
 tR = log(0.95)/real(poles(2));
-Ts = tR/2
+Ts =  (tR/3)
 %--------------------------------------------------------------------------
 %LECTURA DEL EXCEL---------------------------------------------------------
 excel = xlsread('Curvas_Medidas_Motor_2024.xls');
@@ -43,7 +43,11 @@ tsim = 0:Ts:N*Ts;
 tl = linspace(0,0,N);
 for i=1: N+1 
     [~ , ind] = min( abs(t-i*Ts) );
-    tl(i) = 1000*TL(ind);
+    if (ind+1) < length(TL)
+        tl(i) = ( (TL(ind) +  TL(ind+1))/2);
+    else
+        tl(i) = TL(ind);
+    end  
 end
 clear TL;
 clear t;
@@ -96,5 +100,5 @@ plot(tsim, Theta);
 title('Motor');xlabel('Tiempo [s]'); ylabel('Angulo [Rad]'); ylim([0 2]); grid;
 subplot(4,1,4)
 plot(tsim, tl);
-title('Entradas'); xlabel('Tiempo [s]'); ylabel('[m.N.cm][Volts]'); legend('Perturbación','Tensión Armadura')
+title('Entradas'); xlabel('Tiempo [s]'); ylabel('[N.m][Volts]'); legend('Perturbación','Tensión Armadura')
 %--------------------------------------------------------------------------

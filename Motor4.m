@@ -39,6 +39,7 @@ xop = [0 0 0]';
 t = 0:deltaT:N*deltaT;
 u = Ei*ones(1, length(t));                                                 %Entrada de tensión Va
 TORQUE_MAX = 0.0014
+%TORQUE_MAX = 0.005
 %Perturbación del tipo escalon
     tL = TORQUE_MAX*heaviside(t - 2);
 %Perturbación del tipo rampa

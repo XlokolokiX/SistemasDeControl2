@@ -22,7 +22,7 @@ I = Datos(1:end,3);
 Va = Datos(1:end,4);
 Ei = 12;
 deltaT = Datos(1,1);
-delayT = Datos(702,1);
+delayT = Datos(702,1)
 %--------------------------------------------------------------------------
 %GRÁFICA DEL EXCEL---------------------------------------------------------
 figure(1);
@@ -101,18 +101,12 @@ G_I = tf(k_I*[T3_I 1],conv([T1_I 1],[T2_I 1]))
 [Iobt, tobt] = lsim(G_I, Va(1:1500), t(1:1500));
 
 figure(3)
-subplot(4,1,1)
-plot(tobt,Wm(1:1500));
-title('Velocidad Angular Excel'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);
-subplot(4,1,2)
-plot(tobt,Wobt);
-title('Velocidad Angular Obtenida'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);
-subplot(4,1,3)
-plot(tobt,I(1:1500));
-title('Corriente Excel'); xlabel('Tiempo [s]'); ylabel('[I]');
-subplot(4,1,4)
-plot(tobt,Iobt);
-title('Corriente Obtenida'); xlabel('Tiempo [s]'); ylabel('[I]');
+subplot(2,1,1)
+plot(tobt,Wobt ,tobt,Wm(1:1500));
+title('Velocidad Angular'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);legend('Obtenida','Excel')
+subplot(2,1,2)
+plot(tobt,Iobt, tobt,I(1:1500));
+title('Corriente'); xlabel('Tiempo [s]'); ylabel('[I]');legend('Obtenida','Excel')
 %--------------------------------------------------------------------------
 %OBTENCIÓN DE PARÁMETROS---------------------------------------------------
 ki = (G_W.num{1}(3))

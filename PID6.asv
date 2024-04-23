@@ -11,7 +11,7 @@
 clc; clear all; close all;
 
 %PARÁMETROS DEL MOTOR------------------------------------------------------
-Laa = 4.99e-4; J = 4.1302e-6; Ra = 19.9758; Bm = 7.4654e-16; Ki = 16.5207; Km = 0.0605;     
+Laa = 4.99e-4; J = 2.06e-6; Ra = 19.9758; Bm = 7.4654e-16; Ki = 0.01162; Km = 0.0605;     
 Ei = 12;                                                                   
 %--------------------------------------------------------------------------
 %MODELADO EN ESP. ESTADO---------------------------------------------------
@@ -29,13 +29,13 @@ G1 = tf(num1, den1)
 %RESPUESTAS DEL SISTEMA----------------------------------------------------
 poles = pole(G);
 tR = log(0.95)/real(poles(2));
-Ts = tR/2
+Ts =  (tR/3)
 %--------------------------------------------------------------------------
 %LECTURA DEL EXCEL---------------------------------------------------------
 excel = xlsread('Curvas_Medidas_Motor_2024.xls');
 t = excel(1:end,1);
 TL = excel(1:end,5);
-tFinal = t(length(t))/2.5;
+tFinal = t(length(t));
 %--------------------------------------------------------------------------
 %TORQUE DESCRITO-----------------------------------------------------------
 N = floor(tFinal/Ts)                                                       %N puntos a simular
@@ -43,13 +43,17 @@ tsim = 0:Ts:N*Ts;
 tl = linspace(0,0,N);
 for i=1: N+1 
     [~ , ind] = min( abs(t-i*Ts) );
-    tl(i) = 1000*TL(ind);
+    if (ind+1) < length(TL)
+        tl(i) = ( (TL(ind) +  TL(ind+1))/2);
+    else
+        tl(i) = TL(ind);
+    end  
 end
 clear TL;
 clear t;
 %--------------------------------------------------------------------------
 %PID DISCRETO--------------------------------------------------------------
-Kp = 4; Ki = 10; Kd = 0;
+Kp = 10; Ki = 4; Kd = 0.5;
 A1=((2*Kp*Ts)+(Ki*(Ts^2))+(2*Kd))/(2*Ts) 
 B1=(-2*Kp*Ts+Ki*(Ts^2)-4*Kd)/(2*Ts) 
 C1=Kd/Ts
@@ -85,19 +89,16 @@ for i=1 : N
 end
 %--------------------------------------------------------------------------
 %GRÁFICAS------------------------------------------------------------------
-subplot(5,1,1)
+subplot(4,1,1)
 plot(tsim, W); grid;
-title('Motor'); xlabel('Tiempo [s]'); ylabel('Velocidad angular [Rad/s]'); ylim([-3 3]);
-subplot(5,1,2)
-plot(tsim, W); grid;
-title('Motor'); xlabel('Tiempo [s]'); ylabel('Velocidad angular [Rad/s]'); 
-subplot(5,1,3)
+title('Motor'); xlabel('Tiempo [s]'); ylabel('Velocidad angular [Rad/s]'); ylim([-10 10]);
+subplot(4,1,2)
 plot(tsim, I); grid;
 title('Armadura'); xlabel('Tiempo [s]'); ylabel('Corriente [A]'); ylim([0 0.1]); grid;
-subplot(5,1,4)
+subplot(4,1,3)
 plot(tsim, Theta);
-title('Motor');xlabel('Tiempo [s]'); ylabel('Angulo [Rad]'); ylim([0 2]);
-subplot(5,1,5)
+title('Motor');xlabel('Tiempo [s]'); ylabel('Angulo [Rad]'); ylim([0 2]); grid;
+subplot(4,1,4)
 plot(tsim, tl);
 title('Entradas'); xlabel('Tiempo [s]'); ylabel('[m.N.cm][Volts]'); legend('Perturbación','Tensión Armadura')
 %--------------------------------------------------------------------------
