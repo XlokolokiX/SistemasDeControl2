@@ -20,6 +20,7 @@ t = Datos(1:end,1);
 Wm = Datos(1:end,2);
 I = Datos(1:end,3);
 Va = Datos(1:end,4);
+Tl = Datos(1:end,5);
 Ei = 12;
 deltaT = Datos(1,1);
 delayT = Datos(702,1)
@@ -96,7 +97,7 @@ T3_I = beta_I*(T1_I - T2_I) + T1_I;
 
 G_I = tf(k_I*[T3_I 1],conv([T1_I 1],[T2_I 1]))
 %--------------------------------------------------------------------------
-%COMPARACIÓN CON EXCEL-----------------------------------------------------
+%COMPARACIÓN CON EXCEL (TRANSITORIO)---------------------------------------
 [Wobt, tobt] = lsim(G_W, Va(1:1500), t(1:1500));
 [Iobt, tobt] = lsim(G_I, Va(1:1500), t(1:1500));
 
@@ -115,4 +116,56 @@ B = G_I.num{1}(3)
 L = G_I.den{1}(1)/J
 R = (G_I.den{1}(2)-L*B)/J
 km = (1-R*B)/ki
+%--------------------------------------------------------------------------
+
+
+%PARÁMETROS DEL MOTOR (RECALCULADO PARA EL TORQUE)-------------------------
+L = 5e-4; J = 2.35e-9; ki = 0.0094054;                                         
+%--------------------------------------------------------------------------
+%COMPROBACION DEL MODELO CON LA ENTRADA TORQUE-----------------------------
+tFinal = t(end);
+
+%Variables de estados, x1 = ia; x2 = wr; u = Va, Tl
+%Sistema M I S O
+A = [-R/L -km/L ; ki/J -B/J]
+B = [1/L 0 ; 0 -1/J]
+C = [0 1]                                                                 %Salida omega_R
+D = [0 0]
+
+Ts = 0.5e-5;
+
+%Creo mi propio vector tiempo , TL y Va
+N = floor(tFinal/Ts)
+tProp = 0:Ts:N*Ts;
+tl = linspace(0,0,N);
+for i=1: N+1 
+    [~ , ind] = min( abs(t-i*Ts) );
+    if (ind+1) < length(Tl)
+        tl(i) = ( (Tl(ind) +  Tl(ind+1))/2);
+    else
+        tl(i) = Tl(ind);
+    end  
+end
+
+va = linspace(0,0,N);
+for i=1: N+1 
+    [~ , ind] = min( abs(t-i*Ts) );
+    if (ind+1) < length(Va)
+        va(i) = ( (Va(ind) +  Va(ind+1))/2);
+    else
+        va(i) = Va(ind);
+    end  
+end
+
+%Simulación del modelo con las entradas obtenidas
+x = [0 0]';
+Wm_(1) = 0;
+for i=1 : N
+    xp = A*x + B*[va(i) tl(i)]';
+    x = x + xp*Ts;
+    Wm_(i+1) = C*x;
+end
+figure(4)
+plot(t,Wm ,tProp,Wm_);
+title('Velocidad Angular (Con perturbación)'); xlabel('Tiempo [s]'); ylabel('[Rad/s]'); ylim([0 250]);legend('Obtenida','Excel')
 %--------------------------------------------------------------------------
