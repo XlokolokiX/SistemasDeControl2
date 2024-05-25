@@ -1,22 +1,22 @@
 %% Sistemas de Control II -FCEFyN-UNC 
 % Profesor: Dr.Ing. Pucheta, Julian
 % Alumno: Mouton Laudin, Alfonso
-% Tp N∞ 2 - ITEM 1 - 
+% Tp N¬∞ 2 - ITEM 1 - 
 %
-%   Implementar un sistema en variables de estado que controle el ·ngulo del motor, para 
-%   consignas de pi/2 y ñpi/2 cambiando cada 5 segundos y que el TL es el descripto en la planilla de datos 
-%   comparando el desempeÒo con el obtenido con el PID digital del TP N∫1. Hallar el valor de 
-%   integraciÛn Euler adecuado.
+%   Implementar un sistema en variables de estado que controle el √°ngulo del motor, para 
+%   consignas de pi/2 y ‚Äìpi/2 cambiando cada 5 segundos y que el TL es el descripto en la planilla de datos 
+%   comparando el desempe√±o con el obtenido con el PID digital del TP N¬∫1. Hallar el valor de 
+%   integraci√≥n Euler adecuado.
 %
-%   OBJETIVO: acelerar la din·mica del controlador verificando el resultado con las curvas del archivo xlsx 
+%   OBJETIVO: acelerar la din√°mica del controlador verificando el resultado con las curvas del archivo xlsx 
 %   adjunto.
 % 
-%   -Evitando que la tensiÛn supere los 24Volts en valor absoluto, especificar el tiempo de muestreo 
+%   -Evitando que la tensi√≥n supere los 24Volts en valor absoluto, especificar el tiempo de muestreo 
 %    necesario para el controlador cumpla el objetivo. 
-%   -Asumiendo que no puede medirse directamente la corriente, pero sÌ la velocidad y el ·ngulo, 
+%   -Asumiendo que no puede medirse directamente la corriente, pero s√≠ la velocidad y el √°ngulo, 
 %    proponer un controlador que logre el objetivo. 
-%   -Determinar el efecto de la nolinealidad en la acciÛn de control, descripta en la Fig. 2, y verificar cu·l 
-%    es el m·ximo valor admisible de Èsa no linealidad. 
+%   -Determinar el efecto de la nolinealidad en la acci√≥n de control, descripta en la Fig. 2, y verificar cu√°l 
+%    es el m√°ximo valor admisible de √©sa no linealidad. 
 %%
 clc; clear all; close all;
 
@@ -33,7 +33,7 @@ deltaT = Datos(1,1);
 delayT = Datos(702,1)
 
 %%
-%%MODELADO DEL MOTOR LAZO ABIERTO (ContÌnuo)
+%%MODELADO DEL MOTOR LAZO ABIERTO (Cont√≠nuo)
 Ki = 0.01162; J = 2.0628e-9; Bm = 0; Laa = 7.0274e-4; Ra = 28.13; Km = 0.0605;
 
 A_c = [-Ra/Laa -Km/Laa 0;     %x1: Corriente
@@ -44,13 +44,13 @@ B_c = [1/Laa 0;
         0 -1/J;
         0    0]
 
-C_c = [0  0  1]               %¡ngulo
+C_c = [0  0  1]               %√Ångulo
 
 D_c = [0 0]
 
 G = ss(A_c, B_c, C_c, D_c)
 
-%DeterminaciÛn del los tiempos de la din·mica del sistema contÌnuo
+%Determinaci√≥n del los tiempos de la din√°mica del sistema cont√≠nuo
 root_c = eig(A_c);
 tR = log(0.95)/ real(root_c(2))
 tL = log(0.05)/ real(root_c(2))
@@ -62,7 +62,7 @@ Tm = (tR/4)                 %Tiempo de muestreo
 G_d = c2d(G ,Tm ,'zoh');
 A_d = G_d.a
 B_d = G_d.b;
-B_d = B_d(:,1)              %Ya que sÛlo me interesa controlar el ·ngulo
+B_d = B_d(:,1)              %Ya que s√≥lo me interesa controlar el √°ngulo
 C_d = G_d.c
 D_d = G_d.d
 %%
@@ -74,13 +74,13 @@ rank(Mc)
 
 %%
 %SISTEMA AMPLIADO
-AA = [A_d , zeros(3,1) ; -C_d(1,:), 1]
-BA = [B_d ; 0]
+AA = [A_d , zeros(3,1) ; -C_d(1,:)*A_d, 1]
+BA = [B_d ; -C_d(1,:)*B_d]
 
 %LQR CONTROLADOR          %Se dimensiona a prueba y error
 %Q actua sobre las variables estado
-%d_c = [1 0.1 0.01 0.1];        %Corriente, velocidad , ¡ngulo, error
-d_c = [1.3744 6.25e-6 0.40528 0.1];        %Corriente, velocidad , ¡ngulo, error
+%d_c = [1 0.1 0.01 0.1];        %Corriente, velocidad , √Ångulo, error
+d_c = [1.3744 6.25e-6 0.40528 0.1];        %Corriente, velocidad , √Ångulo, error
 %d_c = [0.1 0.01 100 10]
 Q_c = diag(d_c);
 %R actua sobre la  accion de control
@@ -96,20 +96,20 @@ Bo = C_d'
 Co = B_d'
 
 %LQR OBSERVADOR
-d_o = [1e1 10 .09e0];    %Corriente, velocidad, ¡ngulo, error
+d_o = [1e1 10 .09e0];    %Corriente, velocidad, √Ångulo, error
 Q_o = diag(d_o); 
 R_o = 1e1
 K_O = (dlqr(Ao,Bo,Q_o,R_o))'
 
 %%
-%SIMULACI”N
+%SIMULACI√ìN
 Bloques_Sist = imread('Bloques_Motor.png');
 figure(1);
 imshow(Bloques_Sist);
 
-Tf = 0.03;              %Tiempo final para la simulaciÛn
-Ti = Tm                 %Tiempo de IntegraciÛn
-N = floor(Tf/Ti)        %Numero de pasos para la simulaciÛn
+Tf = 0.03;              %Tiempo final para la simulaci√≥n
+Ti = Tm                 %Tiempo de Integraci√≥n
+N = floor(Tf/Ti)        %Numero de pasos para la simulaci√≥n
 death_zone = 1;         %Zona muerta del Actuador
 
 t = 0:Ti:N*Ti;
@@ -120,7 +120,7 @@ u = zeros(1, N+1);
 
 %Referencia que cambia cada 5seg
 Ref = (pi/2)*square(t*2*pi/5);  
-%Vector perturbaciÛn
+%Vector perturbaci√≥n
 Tl = max(Tl_E)*square(t*2*pi/0.3);
 Tl(Tl<0)=0;
 
@@ -165,17 +165,17 @@ for i=1: N
 end
 
 %%
-%GR¡FICAS
+%GR√ÅFICAS
 
 figure(2);
 subplot(3,2,1);hold on;
-plot(t ,Theta,t,Ref); title('¡ngulo  \phi [rad]'); grid on; hold on;
+plot(t ,Theta,t,Ref); title('√Ångulo  \phi [rad]'); grid on; hold on;
 subplot(3,2,2);hold on;
 plot(t ,Wr); title('Velocidad Angular  \omega [rad/s]');grid on;hold on; 
 subplot(3,2,3);hold on;
 plot(t ,Ia); title('Corriente  Ia [A]');grid on;hold on; 
 subplot(3,2,4);hold on;
-plot(t ,u); title('AcciÛn de control  V [V]');grid on;hold on;
+plot(t ,u); title('Acci√≥n de control  V [V]');grid on;hold on;
 subplot(3,1,3);hold on;
 plot(t ,Tl);title('Torque  TL [N/m]');grid on;hold on;
 
