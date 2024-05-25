@@ -135,7 +135,7 @@ psita = 0;
 for i=1: N
     
     psita_p = Ref(i) - C_c*x;       %Err Integrador
-    psita = psita + psita_p*Ti;
+    psita = psita + psita_p;
     
     %Control
     u(i) = -K*x + Ki*psita;          %Sin Observador
