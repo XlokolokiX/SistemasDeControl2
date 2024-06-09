@@ -40,11 +40,11 @@ D_c = [0]
 G = ss(A_c, B_c ,C_c , D_c)
 %Determinación de los tiempos de dinámica
 roots_c = eig(A_c)
-tR = abs(log(0.95)/real(roots_c(2)));
+tR = abs(log(0.95)/real(roots_c(2)))
 
 %%
 %SISTEMA DISCRETIZADO
-Tm = .1;
+Tm = tR/12
 
 G_d = c2d(G, Tm , 'zoh');
 A_d = G_d.a
@@ -72,7 +72,7 @@ W = [coef_A(5) coef_A(4) coef_A(3) coef_A(2) 1;
  
 T = Mc*W;
 p1 = -15+15*i; p2 = -15-15*i ;p3 = -0.5+0.5*i ;p4 = -0.5-0.5*i;     %Polos en plano S
-p5 = -1;%Polo del integrador
+p5 = -0.2;%Polo del integrador
 %Transformación Bilineal (plano z)
 polos_d = exp([p1 p2 p3 p4 p5]*Tm)
 alfa_i = poly(polos_d)
@@ -97,7 +97,7 @@ Ko = dlqr(Ao, Bo, Qo, Ro)'
 %%
 %SIMULACIÓN
 Tf = 70;            %Tiempo Final para la Simulación
-Ti = 0.001;        	%Tiempo de Integración Euler
+Ti = 0.01;        	%Tiempo de Integración Euler
 N  = ceil(Tf/Ti)    %Numero de puntos a simular
 deathZone = 0.5;
 

@@ -108,11 +108,11 @@ K_o = (dlqr(Ao,Bo,Q_o,R_o))'
 
 %%
 %SIMULACIÓN
-Bloques_Sist = imread('Bloques_Motor.png');
+Bloques_Sist = imread('Bloques_Motor.jpeg');
 figure(1);
 imshow(Bloques_Sist);
 
-Tf = 2;                                 %Tiempo final para la simulación
+Tf = 0.1;                                 %Tiempo final para la simulación
 Ti = Tm                                 %Tiempo de Integración
 N = floor(Tf/Ti)                        %Numero de pasos para la simulación
 death_zone = 1;                         %Zona muerta del Actuador
@@ -125,7 +125,7 @@ u = zeros(1, N+1);
 
 %Referencia que cambia cada 5seg
 %Ref = (pi/2)*square(t*2*pi/5); 
-Ref = (pi/2)*square(t*2*pi/0.5); 
+Ref = (pi/2)*square(t*2*pi/0.5);
 %Vector perturbación
 Tl = max(Tl_E)*square(t*2*pi/0.3);
 Tl(Tl<0)=0;
@@ -143,7 +143,7 @@ for i=1: N
     y = C_d*x;
     y_obs = C_d*x_obs;
     
-    psita_p = Ref(i) - C_d*x;       %Err Integrador
+    psita_p = Ref(i) - y;       %Err Integrador
     psita = psita + psita_p;
     
     %Control

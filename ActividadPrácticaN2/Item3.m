@@ -16,7 +16,7 @@
 clc; clear all; close all;
 
 %Parámetros del péndulo
-m1  = 0.1; m2 = m1*10; F  = 0.1; l  = 1.6; g  = 9.8; M  = 1.5;
+m1  = 0.1; m2 = m1*10; F  = 0.1; l = 1.6; g  = 9.8; M  = 1.5;
 %MODELADO EN EE (Contínuo)
 %1er Recorrido (0-10):
 A_c1 = [0     1               0          0;       %x1 = delta - desplazamiento
@@ -154,7 +154,7 @@ phi_p(1) = 0;
 x = [d(1) d_p(1) phi(1) phi_p(1)]';
 xop = [0 0 pi 0]';
 
-x_obs = [0 0 pi 0]';
+x_obs = [d(1) d_p(1) phi(1) phi_p(1)]';
 
 K = K1;
 Ki = Ki1;
@@ -171,6 +171,7 @@ SAMPLE_T = floor(Tm/Ti);
 um = 0;
 y = [0 0]';
 y_obs = [0 0]';
+
 for i=1 : N
     
     %Actualizo la acción de control por cada período de muestreo
